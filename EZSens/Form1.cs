@@ -1,93 +1,121 @@
+using System;
 using System.Diagnostics;
+using System.Reflection;
+
 namespace EZSens {
-public partial class Form1 : Form {
-    Label                      gamelistLabel, aratioLabel, mdratioLabel, hipfovLabel, hipdistLabel, go;
-    LinkLabel                  url;
-    ComboBox                   gamelistBox, aratioBox;
-    TextBox                    mdratioBox, hipfovBox, hipdistBox, result;
-    Button                     Calc;
+public class Base : Form {
+    protected void urlClick (object sender, EventArgs e) {
+        LinkLabel link   = (LinkLabel)sender;
+        link.LinkVisited = true;
+        var info         = new ProcessStartInfo {
+            UseShellExecute = true,
+            FileName        = link.Text,
+        };
+        Process.Start (info);
+    }
+    protected void urlClick (object sender, LinkClickedEventArgs e) {
+        var info = new ProcessStartInfo {
+            UseShellExecute = true,
+            FileName        = e.LinkText,
+        };
+        Process.Start (info);
+    }
+}
+public partial class Form1 : Base {
+    private readonly Label     gamelistLabel, aratioLabel, mdratioLabel, hipfovLabel, hipdistLabel, go;
+    private readonly LinkLabel msensUrl;
+    private readonly ComboBox  gamelistBox, aratioBox;
+    private readonly TextBox   mdratioBox, hipfovBox, hipdistBox, result;
+    private readonly Button    doCalc, ver;
     int                        gameidx, aridx;
     bool                       suutihantei;
     double                     aratio, mdratio, hipfov, hipdist, alpha0, alpha1;
-    Dictionary<string, double> fovWithOptics, distanceWithOptics;
+    private readonly Dictionary<string, double> fovWithOptics, distanceWithOptics;
     public Form1() {
         InitializeComponent();
         Width           = 600;
         FormBorderStyle = FormBorderStyle.FixedSingle;
         MaximizeBox     = false;
 
-        gamelistLabel          = new Label();
+        gamelistLabel          = new();
         gamelistLabel.AutoSize = true;
-        gamelistLabel.Location = new Point (20, 20);
+        gamelistLabel.Location = new(20, 20);
         gamelistLabel.Text     = "・Game title";
 
-        aratioLabel          = new Label();
+        aratioLabel          = new();
         aratioLabel.AutoSize = true;
-        aratioLabel.Location = new Point (20, 70);
+        aratioLabel.Location = new(20, 70);
         aratioLabel.Text     = "・Aspact ratio";
 
-        mdratioLabel          = new Label();
+        mdratioLabel          = new();
         mdratioLabel.AutoSize = true;
-        mdratioLabel.Location = new Point (20, 120);
+        mdratioLabel.Location = new(20, 120);
         mdratioLabel.Text     = "・Monitor Distance [%]";
 
-        hipfovLabel          = new Label();
+        hipfovLabel          = new();
         hipfovLabel.AutoSize = true;
-        hipfovLabel.Location = new Point (20, 170);
+        hipfovLabel.Location = new(20, 170);
         hipfovLabel.Text     = "・In-Game Hipfire FOV";
 
-        hipdistLabel          = new Label();
+        hipdistLabel          = new();
         hipdistLabel.AutoSize = true;
-        hipdistLabel.Location = new Point (20, 220);
+        hipdistLabel.Location = new(20, 220);
         hipdistLabel.Text     = "・Hipfire 360° Distance [cm]";
 
-        go          = new Label();
+        go          = new();
         go.AutoSize = true;
-        go.Location = new Point (200, 380);
+        go.Location = new(200, 380);
 
-        url          = new LinkLabel();
-        url.AutoSize = true;
-        url.Location = new Point (220, 380);
-        url.Click += new EventHandler (urlClick!);
+        msensUrl          = new();
+        msensUrl.AutoSize = true;
+        msensUrl.Location = new(220, 380);
+        msensUrl.Click += new(urlClick!);
 
-        result           = new TextBox();
-        result.Size      = new Size (360, 350);
+        result           = new();
+        result.Size      = new(360, 350);
         result.Multiline = true;
         // result.ReadOnly = true;
-        result.Location = new Point (180, 20);
+        result.Location = new(180, 20);
         result.Text     = "計算結果";
 
         string[] gamelist    = new string[] { "Apex", "R6S", "Valorant", "Splitgate", "CSGO", "Overwatch" };
-        gamelistBox          = new ComboBox();
-        gamelistBox.Location = new Point (20, 40);
+        gamelistBox          = new();
+        gamelistBox.Location = new(20, 40);
         gamelistBox.Items.AddRange (gamelist);
         gamelistBox.DropDownStyle = ComboBoxStyle.DropDownList; // 入力不可のリストにする
-        gamelistBox.SelectedIndexChanged += new EventHandler (gameSelected!);
+        gamelistBox.SelectedIndexChanged += new(gameSelected!);
 
         string[] aratiolist = new string[] { "16:9", "5:3", "16:10", "3:2", "4:3", "5:4", "1:1" };
-        aratioBox           = new ComboBox();
-        aratioBox.Location  = new Point (20, 90);
+        aratioBox           = new();
+        aratioBox.Location  = new(20, 90);
         aratioBox.Items.AddRange (aratiolist);
         aratioBox.DropDownStyle = ComboBoxStyle.DropDownList;
 
-        mdratioBox          = new TextBox();
-        mdratioBox.Location = new Point (20, 140);
+        mdratioBox          = new();
+        mdratioBox.Location = new(20, 140);
 
-        hipfovBox          = new TextBox();
-        hipfovBox.Location = new Point (20, 190);
+        hipfovBox          = new();
+        hipfovBox.Location = new(20, 190);
 
-        hipdistBox          = new TextBox();
-        hipdistBox.Location = new Point (20, 240);
+        hipdistBox          = new();
+        hipdistBox.Location = new(20, 240);
 
-        Calc               = new Button();
-        Calc.Location      = new Point (460, 405);
-        Calc.Name          = "計算実行";
-        Calc.Size          = new Size (75, 23);
-        Calc.TabIndex      = 0;
-        Calc.Text          = "計算実行";
+        doCalc             = new();
+        doCalc.Location    = new(460, 405);
+        doCalc.Name        = "計算実行";
+        doCalc.Size        = new(75, 23);
+        doCalc.TabIndex    = 0;
+        doCalc.Text        = "計算実行";
         fovWithOptics      = new Dictionary<string, double>();
         distanceWithOptics = new Dictionary<string, double>();
-        Calc.Click += new EventHandler (Calc_Click!);
+        doCalc.Click += new(doCalcClick!);
+
+        ver          = new();
+        ver.Location = new(20, 405);
+        ver.Name     = "version";
+        ver.AutoSize = true;
+        ver.Text     = "バージョン情報";
+        ver.Click += new(verClick!);
 
         Controls.Add (gamelistBox);
         Controls.Add (gamelistLabel);
@@ -96,32 +124,29 @@ public partial class Form1 : Form {
         Controls.Add (mdratioBox);
         Controls.Add (mdratioLabel);
         Controls.Add (go);
-        Controls.Add (url);
+        Controls.Add (msensUrl);
         Controls.Add (hipfovBox);
         Controls.Add (hipfovLabel);
         Controls.Add (hipdistBox);
         Controls.Add (hipdistLabel);
-        Controls.Add (Calc);
+        Controls.Add (ver);
+        Controls.Add (doCalc);
         Controls.Add (result);
         Text = "EZSens C#";
     }
-    private double division (string frac) {
+    private static double division (string frac) {
         string[] arr = frac.Split ('/');
         return float.Parse (arr[0]) / float.Parse (arr[1]);
     }
-    private string setPrecision (double value, int digits) {
+    private static string setPrecision (double value, int digits) {
         string ret = value.ToString();
         if (ret.Length > digits + 1)
             ret = Math.Round (value, digits + (value < 1 ? 1 : 0) - ret.IndexOf ('.')).ToString();
         return ret;
     }
-    private void urlClick (object sender, EventArgs e) {
-        url.LinkVisited = true;
-        var info        = new ProcessStartInfo {
-            UseShellExecute = true,
-            FileName        = "https://www.youtube.com/watch?v=n5xQiK14soE",
-        };
-        Process.Start (info);
+    protected void verClick (object sender, EventArgs e) {
+        Dialog dialog = new();
+        dialog.ShowDialog();
     }
     private void gameSelected (object sender, EventArgs e) {
         gameidx = gamelistBox.SelectedIndex;
@@ -146,14 +171,14 @@ public partial class Form1 : Form {
             break;
         }
     }
-    void VtoH() {
+    void verticalFOVtoHrizontalFOV() {
         foreach (string key in fovWithOptics.Keys) {
             fovWithOptics[key] =
               2 * Math.Atan (Math.Tan (fovWithOptics[key] * hipfov / 2 * Math.PI / 180) * aratio) / Math.PI * 180;
         }
         hipfov = 2 * Math.Atan (Math.Tan (hipfov / 2 * Math.PI / 180) * aratio) / Math.PI * 180;
     }
-    void Hdeg4to3Fix() {
+    void fix4to3Hdeg() {
         foreach (string key in fovWithOptics.Keys) {
             fovWithOptics[key] =
               2 * Math.Atan (Math.Tan (fovWithOptics[key] * hipfov / 2 * Math.PI / 180) * aratio * 3 / 4) / Math.PI *
@@ -161,14 +186,14 @@ public partial class Form1 : Form {
         }
         hipfov = 2 * Math.Atan (Math.Tan (hipfov / 2 * Math.PI / 180) * aratio * 3 / 4) / Math.PI * 180;
     }
-    void calcSens() {
+    void calc() {
         foreach (string key in distanceWithOptics.Keys) {
             alpha0                  = Math.Atan (mdratio * Math.Tan (hipfov / 2 * Math.PI / 180));
             alpha1                  = Math.Atan (mdratio * Math.Tan (fovWithOptics[key] / 2 * Math.PI / 180));
             distanceWithOptics[key] = hipdist * alpha0 / alpha1;
         }
     }
-    private void Calc_Click (object sender, EventArgs e) {
+    private void doCalcClick (object sender, EventArgs e) {
         // 入力が正しいか判定
         gameidx     = gamelistBox.SelectedIndex;
         aridx       = aratioBox.SelectedIndex;
@@ -181,7 +206,7 @@ public partial class Form1 : Form {
         }
 
 #pragma warning disable CS8602 // null 参照の可能性があるものの逆参照です。->
-                               // 先にインデックスで判定してるからnullは来ない
+        // 先にインデックスで判定してるからnullは来ない
         aratio = division (aratioBox.SelectedItem.ToString().Replace (":", "/"));
 #pragma warning restore CS8602 // null 参照の可能性があるものの逆参照です。
         mdratio = double.Parse (mdratioBox.Text) / 100;
@@ -226,8 +251,8 @@ public partial class Form1 : Form {
             distanceWithOptics.Add ("10x", 0.0);
 
             hipfov *= 70;
-            Hdeg4to3Fix();
-            calcSens();
+            fix4to3Hdeg();
+            calc();
             break;
         case 1:
             if (hipfov < 60 || hipfov > 90) {
@@ -255,8 +280,8 @@ public partial class Form1 : Form {
             distanceWithOptics.Add ("5x", 0.0);
             distanceWithOptics.Add ("12x", 0.0);
 
-            VtoH();
-            calcSens();
+            verticalFOVtoHrizontalFOV();
+            calc();
             break;
         case 2:
             fovWithOptics.Clear();
@@ -275,7 +300,7 @@ public partial class Form1 : Form {
             distanceWithOptics.Add ("3.50x - Marshal", 0.0);
             distanceWithOptics.Add ("5x - Operator", 0.0);
 
-            calcSens();
+            calc();
             break;
         case 3:
             if (hipfov < 0 || hipfov > 180) {
@@ -301,7 +326,7 @@ public partial class Form1 : Form {
                       180;
                 }
             }
-            calcSens();
+            calc();
             break;
         case 4:
             fovWithOptics.Clear();
@@ -316,8 +341,8 @@ public partial class Form1 : Form {
             distanceWithOptics.Add ("Zoomed 2: SSG 08, G3SG1, SCAR-20", 0.0);
             distanceWithOptics.Add ("Zoomed: AUG, SG 553", 0.0);
 
-            Hdeg4to3Fix();
-            calcSens();
+            verticalFOVtoHrizontalFOV();
+            calc();
             break;
         case 5:
             if (hipfov < 80 || hipfov > 103) {
@@ -333,15 +358,76 @@ public partial class Form1 : Form {
             distanceWithOptics.Add ("1x, Pistol, SMG, SG", 0.0);
             distanceWithOptics.Add ("AR, LMG Sniper", 0.0);
 
-            calcSens();
+            calc();
             break;
+        default:
+            MessageBox.Show (
+              "予期しないエラーです。\r\nできればこのエラーが起きた経緯をTwitter:@IAMNuN999まで教えてください",
+              "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            return;
         }
         result.Text = "計算結果\r\n";
         foreach (KeyValuePair<string, double> item in distanceWithOptics) {
             result.AppendText ("\r\n" + item.Key + " は " + setPrecision (item.Value, 8) + "[cm/360°]\r\n");
         }
-        go.Text  = "go";
-        url.Text = "https://www.mouse-sensitivity.com/";
+        go.Text       = "go";
+        msensUrl.Text = "https://www.mouse-sensitivity.com/";
+    }
+}
+class Dialog : Base {
+    private readonly Label       productLabel, authorLabel, versionLabel, discLabel;
+    private readonly RichTextBox discBox;
+    public Dialog() {
+        Text = "バージョン情報";
+        // ダイアログボックス用の設定
+        MaximizeBox     = false; // 最大化ボタンを表示しない
+        MinimizeBox     = false; // 最小化ボタンを表示しない
+        ShowInTaskbar   = false; // タスクバーに表示しない
+        FormBorderStyle = FormBorderStyle.FixedSingle;
+        Size            = new(450, 280);
+
+        var assembly       = Assembly.GetExecutingAssembly();
+        var titleAttribute = assembly.GetCustomAttribute<AssemblyTitleAttribute>();
+        var title          = titleAttribute is not null ? titleAttribute.Title : null;
+        var version        = assembly.GetName().Version;
+        var trimmedVersion = version is not null ? version.ToString (2) : null;
+        var discAttribute  = assembly.GetCustomAttribute<AssemblyDescriptionAttribute>();
+        var disc           = discAttribute is not null ? discAttribute.Description : null;
+
+        productLabel          = new();
+        productLabel.AutoSize = true;
+        productLabel.Text     = "・アプリ名                  " + title + " v" + trimmedVersion;
+        productLabel.Location = new(50, 30);
+
+        authorLabel          = new();
+        authorLabel.AutoSize = true;
+        authorLabel.Text     = "・製作者                   WakaTaira";
+        authorLabel.Location = new(50, 60);
+
+        versionLabel          = new();
+        versionLabel.AutoSize = true;
+        versionLabel.Text     = "・バージョン                " + assembly.GetName().Version;
+        versionLabel.Location = new(50, 90);
+
+        discLabel          = new();
+        discLabel.AutoSize = true;
+        discLabel.Text     = "・説明                   ";
+        discLabel.Location = new(50, 120);
+
+        discBox            = new();
+        discBox.Location   = new(150, 120);
+        discBox.Size       = new(240, 80);
+        discBox.Multiline  = true;
+        discBox.ReadOnly   = true;
+        discBox.DetectUrls = true;
+        discBox.Text       = disc + "\r\nバグったらTwitter\r\nhttps://twitter.com/IAMNuN999まで";
+        discBox.LinkClicked += new(urlClick!);
+
+        Controls.Add (productLabel);
+        Controls.Add (authorLabel);
+        Controls.Add (versionLabel);
+        Controls.Add (discLabel);
+        Controls.Add (discBox);
     }
 }
 }
