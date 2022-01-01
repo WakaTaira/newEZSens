@@ -34,6 +34,7 @@ public partial class Form1 : Base {
         InitializeComponent();
         Width           = 600;
         FormBorderStyle = FormBorderStyle.FixedSingle;
+        MinimizeBox     = false;
         MaximizeBox     = false;
 
         gamelistLabel          = new();
@@ -114,7 +115,7 @@ public partial class Form1 : Base {
         ver.Name     = "version";
         ver.AutoSize = true;
         ver.Text     = "バージョン情報";
-        ver.Click += new(verClick!);
+        ver.Click += new(versionInfoClick!);
 
         Controls.Add (gamelistBox);
         Controls.Add (gamelistLabel);
@@ -143,9 +144,9 @@ public partial class Form1 : Base {
             ret = Math.Round (value, digits + (value < 1 ? 1 : 0) - ret.IndexOf ('.')).ToString();
         return ret;
     }
-    protected void verClick (object sender, EventArgs e) {
-        Dialog dialog = new();
-        dialog.ShowDialog();
+    protected void versionInfoClick (object sender, EventArgs e) {
+        VersionInfo versionInfo = new();
+        versionInfo.ShowDialog();
     }
     private void gameSelected (object sender, EventArgs e) {
         gameidx = gamelistBox.SelectedIndex;
@@ -372,15 +373,14 @@ public partial class Form1 : Base {
         msensUrl.Text = "https://www.mouse-sensitivity.com/";
     }
 }
-class Dialog : Base {
+class VersionInfo : Base {
     private readonly Label       productLabel, authorLabel, versionLabel, discLabel;
     private readonly RichTextBox discBox;
-    public Dialog() {
+    public VersionInfo() {
         Text = "バージョン情報";
-        // ダイアログボックス用の設定
-        MaximizeBox     = false; // 最大化ボタンを表示しない
-        MinimizeBox     = false; // 最小化ボタンを表示しない
-        ShowInTaskbar   = false; // タスクバーに表示しない
+        MaximizeBox     = false;
+        MinimizeBox     = false;
+        ShowInTaskbar   = false;
         FormBorderStyle = FormBorderStyle.FixedSingle;
         Size            = new(450, 280);
 
