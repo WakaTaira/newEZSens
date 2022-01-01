@@ -221,13 +221,14 @@ public partial class Form1 : Base {
         switch (gameidx) {
         case 0:
             if (hipfov < 1 || (hipfov > 2 && hipfov < 70) || hipfov > 110) {
-                MessageBox.Show ("In-Game FOVは1から2のfovScaleか70から110のゲーム内FOVで入力してください。", "エラー",
-                                 MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show (
+                  "In-Game FOVは70から110のゲーム内FOVで入力してください。\r\n1から2のfovScaleでも計算できます",
+                  "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
-            } else if (hipfov <= 2) {
-                hipfov *= 70;
-            } else {
+            } else if (hipfov >= 70) {
                 hipfov = (1 + (hipfov - 70) * 0.01375) * 70;
+            } else {
+                hipfov *= 70;
             }
             fovWithOptics.Clear();
             fovWithOptics.Add ("1x, Pistol, SMG, SG", 6.0 / 7.0);
