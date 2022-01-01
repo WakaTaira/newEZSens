@@ -73,9 +73,9 @@ public partial class Form1 : Base {
         result           = new();
         result.Size      = new(360, 350);
         result.Multiline = true;
-        // result.ReadOnly = true;
-        result.Location = new(180, 20);
-        result.Text     = "計算結果";
+        result.ReadOnly  = true;
+        result.Location  = new(180, 20);
+        result.Text      = "計算結果";
 
         string[] gamelist    = new string[] { "Apex", "R6S", "Valorant", "Splitgate", "CSGO", "Overwatch" };
         gamelistBox          = new();
@@ -203,11 +203,7 @@ public partial class Form1 : Base {
                              MessageBoxButtons.OK, MessageBoxIcon.Error);
             return;
         }
-
-#pragma warning disable CS8602 // null 参照の可能性があるものの逆参照です。->
-        // 先にインデックスで判定してるからnullは来ない
-        aratio = division (aratioBox.SelectedItem.ToString().Replace (":", "/"));
-#pragma warning restore CS8602 // null 参照の可能性があるものの逆参照です。
+        aratio  = division (aratioBox.SelectedItem.ToString()!.Replace (":", "/"));
         mdratio = double.Parse (mdratioBox.Text) / 100;
         if (mdratio > 100 || mdratio < 0) {
             MessageBox.Show ("Monitar Distanceは0から100の割合で入力してください。", "エラー", MessageBoxButtons.OK,
@@ -224,10 +220,14 @@ public partial class Form1 : Base {
         }
         switch (gameidx) {
         case 0:
-            if (hipfov < 1 || hipfov > 2) {
-                MessageBox.Show ("In-Game FOVは1から2のfovScaleで入力してください。", "エラー", MessageBoxButtons.OK,
-                                 MessageBoxIcon.Error);
+            if (hipfov < 1 || (hipfov > 2 && hipfov < 70) || hipfov > 110) {
+                MessageBox.Show ("In-Game FOVは1から2のfovScaleか70から110のゲーム内FOVで入力してください。", "エラー",
+                                 MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
+            } else if (hipfov <= 2) {
+                hipfov *= 70;
+            } else {
+                hipfov = (1 + (hipfov - 70) * 0.01375) * 70;
             }
             fovWithOptics.Clear();
             fovWithOptics.Add ("1x, Pistol, SMG, SG", 6.0 / 7.0);
@@ -248,8 +248,6 @@ public partial class Form1 : Base {
             distanceWithOptics.Add ("6x", 0.0);
             distanceWithOptics.Add ("8x", 0.0);
             distanceWithOptics.Add ("10x", 0.0);
-
-            hipfov *= 70;
             fix4to3Hdeg();
             calc();
             break;
@@ -361,7 +359,7 @@ public partial class Form1 : Base {
             break;
         default:
             MessageBox.Show (
-              "予期しないエラーです。\r\nできればこのエラーが起きた経緯をTwitter:@IAMNuN999まで教えてください",
+              "出るはずのないエラーです。出すな、ボケ\r\nできればこのエラーが起きた経緯をTwitter:@IAMNuN999まで教えてください",
               "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             return;
         }

@@ -16,9 +16,9 @@ using System.Resources;
 [assembly:AssemblyCompany ("そんなもんネイ")]
 [assembly:AssemblyConfigurationAttribute ("Debug")]
 [assembly:AssemblyProduct ("EZSens")]
-[assembly:AssemblyVersion ("1.0.0.0")]              // アセンブリバージョン
-[assembly:AssemblyFileVersion ("1.0.0.0")]          // ファイルバージョン
-[assembly:AssemblyInformationalVersion ("1.0.0.0")] // 製品バージョン
+[assembly:AssemblyVersion ("1.0.1.0")]              // アセンブリバージョン
+[assembly:AssemblyFileVersion ("1.0.1.0")]          // ファイルバージョン
+[assembly:AssemblyInformationalVersion ("1.0.1.0")] // 製品バージョン
 [assembly:AssemblyTitle ("EZSens")]
 [assembly:System.Runtime.Versioning.TargetPlatformAttribute ("Windows7.0")]
 [assembly:System.Runtime.Versioning.SupportedOSPlatformAttribute ("Windows7.0")]
