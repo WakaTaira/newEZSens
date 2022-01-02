@@ -220,7 +220,8 @@ public partial class Form1 : Base {
             return;
         }
         switch (gameidx) {
-        case 0:
+        case 0: try { throw new Exception ("test");
+            } catch (Exception ex) { hipdistLabel.Text = ex.Message; }
             if (hipfov < 1 || (hipfov > 2 && hipfov < 70) || hipfov > 110) {
                 MessageBox.Show (
                   "In-Game FOVは70から110のゲーム内FOVで入力してください。\r\n1から2のfovScaleでも計算できます",
@@ -374,58 +375,67 @@ public partial class Form1 : Base {
     }
 }
 class VersionInfo : Base {
-    private readonly Label       productLabel, authorLabel, versionLabel, discLabel;
-    private readonly RichTextBox discBox;
+    private readonly Label? productLabel, authorLabel, versionLabel, discLabel;
+    private readonly RichTextBox? discBox;
     public VersionInfo() {
-        Text = "バージョン情報";
+        Text            = "バージョン情報";
         MaximizeBox     = false;
         MinimizeBox     = false;
         ShowInTaskbar   = false;
         FormBorderStyle = FormBorderStyle.FixedSingle;
         Size            = new(450, 280);
+        try {
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            string   title    = assembly.GetCustomAttribute<AssemblyTitleAttribute>().Title;
+            string   version  = assembly.GetName().Version.ToString (2);
+            string   disc     = assembly.GetCustomAttribute<AssemblyDescriptionAttribute>().Description;
 
-        var assembly       = Assembly.GetExecutingAssembly();
-        var titleAttribute = assembly.GetCustomAttribute<AssemblyTitleAttribute>();
-        var title          = titleAttribute is not null ? titleAttribute.Title : null;
-        var version        = assembly.GetName().Version;
-        var trimmedVersion = version is not null ? version.ToString (2) : null;
-        var discAttribute  = assembly.GetCustomAttribute<AssemblyDescriptionAttribute>();
-        var disc           = discAttribute is not null ? discAttribute.Description : null;
+            productLabel          = new();
+            productLabel.AutoSize = true;
+            productLabel.Text     = "・アプリ名                  " + title + " v" + version;
+            productLabel.Location = new(50, 30);
 
-        productLabel          = new();
-        productLabel.AutoSize = true;
-        productLabel.Text     = "・アプリ名                  " + title + " v" + trimmedVersion;
-        productLabel.Location = new(50, 30);
+            authorLabel          = new();
+            authorLabel.AutoSize = true;
+            authorLabel.Text     = "・製作者                   WakaTaira";
+            authorLabel.Location = new(50, 60);
 
-        authorLabel          = new();
-        authorLabel.AutoSize = true;
-        authorLabel.Text     = "・製作者                   WakaTaira";
-        authorLabel.Location = new(50, 60);
+            versionLabel          = new();
+            versionLabel.AutoSize = true;
+            versionLabel.Text     = "・バージョン                " + assembly.GetName().Version;
+            versionLabel.Location = new(50, 90);
 
-        versionLabel          = new();
-        versionLabel.AutoSize = true;
-        versionLabel.Text     = "・バージョン                " + assembly.GetName().Version;
-        versionLabel.Location = new(50, 90);
+            discLabel          = new();
+            discLabel.AutoSize = true;
+            discLabel.Text     = "・説明                   ";
+            discLabel.Location = new(50, 120);
 
-        discLabel          = new();
-        discLabel.AutoSize = true;
-        discLabel.Text     = "・説明                   ";
-        discLabel.Location = new(50, 120);
+            discBox            = new();
+            discBox.Location   = new(150, 120);
+            discBox.Size       = new(240, 80);
+            discBox.Multiline  = true;
+            discBox.ReadOnly   = true;
+            discBox.DetectUrls = true;
+            discBox.Text       = disc + "\r\nバグったらTwitter\r\nhttps://twitter.com/IAMNuN999まで";
+            discBox.LinkClicked += new(urlClick!);
 
-        discBox            = new();
-        discBox.Location   = new(150, 120);
-        discBox.Size       = new(240, 80);
-        discBox.Multiline  = true;
-        discBox.ReadOnly   = true;
-        discBox.DetectUrls = true;
-        discBox.Text       = disc + "\r\nバグったらTwitter\r\nhttps://twitter.com/IAMNuN999まで";
-        discBox.LinkClicked += new(urlClick!);
+            Controls.Add (productLabel);
+            Controls.Add (authorLabel);
+            Controls.Add (versionLabel);
+            Controls.Add (discLabel);
+            Controls.Add (discBox);
 
-        Controls.Add (productLabel);
-        Controls.Add (authorLabel);
-        Controls.Add (versionLabel);
-        Controls.Add (discLabel);
-        Controls.Add (discBox);
+        } catch (NullReferenceException e) {
+            MessageBox.Show (e.ToString(), "なんやこれ！", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            MessageBox.Show ("予期していない例外です。Twitter:@IAMNuN999まで教えてください", "エラー",
+                             MessageBoxButtons.OK, MessageBoxIcon.Error);
+            Application.Exit();
+        } catch (Exception e) {
+            MessageBox.Show (e.ToString(), "なんやこれ！", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            MessageBox.Show ("予期していない例外です。Twitter:@IAMNuN999まで教えてください", "エラー",
+                             MessageBoxButtons.OK, MessageBoxIcon.Error);
+            Application.Exit();
+        }
     }
 }
 }
