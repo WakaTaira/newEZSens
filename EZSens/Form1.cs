@@ -44,22 +44,22 @@ public partial class Form1 : Base {
 
         aratioLabel          = new();
         aratioLabel.AutoSize = true;
-        aratioLabel.Location = new(20, 70);
+        aratioLabel.Location = new(20, 90);
         aratioLabel.Text     = "・Aspact ratio";
 
         mdratioLabel          = new();
         mdratioLabel.AutoSize = true;
-        mdratioLabel.Location = new(20, 120);
+        mdratioLabel.Location = new(20, 160);
         mdratioLabel.Text     = "・Monitor Distance [%]";
 
         hipfovLabel          = new();
         hipfovLabel.AutoSize = true;
-        hipfovLabel.Location = new(20, 170);
+        hipfovLabel.Location = new(20, 230);
         hipfovLabel.Text     = "・In-Game Hipfire FOV";
 
         hipdistLabel          = new();
         hipdistLabel.AutoSize = true;
-        hipdistLabel.Location = new(20, 220);
+        hipdistLabel.Location = new(20, 300);
         hipdistLabel.Text     = "・Hipfire 360° Distance [cm]";
 
         go          = new();
@@ -71,12 +71,13 @@ public partial class Form1 : Base {
         msensUrl.Location = new(220, 380);
         msensUrl.Click += new(urlClick!);
 
-        result           = new();
-        result.Size      = new(360, 350);
-        result.Multiline = true;
-        result.ReadOnly  = true;
-        result.Location  = new(180, 20);
-        result.Text      = "計算結果";
+        result            = new();
+        result.Size       = new(360, 350);
+        result.Multiline  = true;
+        result.ReadOnly   = true;
+        result.Location   = new(180, 20);
+        result.ScrollBars = ScrollBars.Vertical;
+        result.Text       = "計算結果";
 
         string[] gamelist    = new string[] { "Apex", "R6S", "Valorant", "Splitgate", "CSGO", "Overwatch" };
         gamelistBox          = new();
@@ -87,18 +88,22 @@ public partial class Form1 : Base {
 
         string[] aratiolist = new string[] { "16:9", "5:3", "16:10", "3:2", "4:3", "5:4", "1:1" };
         aratioBox           = new();
-        aratioBox.Location  = new(20, 90);
+        aratioBox.Location  = new(20, 110);
         aratioBox.Items.AddRange (aratiolist);
         aratioBox.DropDownStyle = ComboBoxStyle.DropDownList;
 
+        // TODO: 0～9、ピリオド以外はイベントキャンセルにする
         mdratioBox          = new();
-        mdratioBox.Location = new(20, 140);
+        mdratioBox.Location = new(20, 180);
+        mdratioBox.ImeMode  = ImeMode.Disable;
 
         hipfovBox          = new();
-        hipfovBox.Location = new(20, 190);
+        hipfovBox.Location = new(20, 250);
+        hipfovBox.ImeMode  = ImeMode.Disable;
 
         hipdistBox          = new();
-        hipdistBox.Location = new(20, 240);
+        hipdistBox.Location = new(20, 320);
+        hipdistBox.ImeMode  = ImeMode.Disable;
 
         doCalc             = new();
         doCalc.Location    = new(460, 405);
@@ -370,6 +375,10 @@ public partial class Form1 : Base {
         foreach (KeyValuePair<string, double> item in distanceWithOptics) {
             result.AppendText ("\r\n" + item.Key + " は " + setPrecision (item.Value, 8) + "[cm/360°]\r\n");
         }
+        if (gameidx == 0) {
+            result.AppendText (
+              "\r\n  ※注意事項※\r\n ApexではRE-45のアイアンサイト、AR、LMGとスナイパーのアイアンサイト、SMGとSGとRE-45以外のピストルのアイアンサイトはFOVがそれぞれ違いますが、感度が共有されています。\r\nSMG等と1xスコープはFOVが同じなので、設定する際は1X Scope / ADS (SMG, SG, Pistol)を基準とすることをお勧めします。\r\nまた、設定ファイルにおけるmouse_zoomed_sensitivity_scalar_7は使われていません。無視してください。");
+        }
         go.Text       = "go";
         msensUrl.Text = "https://www.mouse-sensitivity.com/";
     }
@@ -383,7 +392,7 @@ class VersionInfo : Base {
         MinimizeBox     = false;
         ShowInTaskbar   = false;
         FormBorderStyle = FormBorderStyle.FixedSingle;
-        Size            = new(450, 280);
+        Size            = new(380, 250);
         try {
             Assembly assembly = Assembly.GetExecutingAssembly();
             string   title    = assembly.GetCustomAttribute<AssemblyTitleAttribute>().Title;
@@ -392,27 +401,27 @@ class VersionInfo : Base {
 
             productLabel          = new();
             productLabel.AutoSize = true;
-            productLabel.Text     = "・アプリ名                  " + title + " v" + version;
-            productLabel.Location = new(50, 30);
+            productLabel.Text     = "・アプリ名                              " + title + " v" + version;
+            productLabel.Location = new(30, 20);
 
             authorLabel          = new();
             authorLabel.AutoSize = true;
-            authorLabel.Text     = "・製作者                   WakaTaira";
-            authorLabel.Location = new(50, 60);
+            authorLabel.Text     = "・製作者                               WakaTaira";
+            authorLabel.Location = new(30, 50);
 
             versionLabel          = new();
             versionLabel.AutoSize = true;
-            versionLabel.Text     = "・バージョン                " + assembly.GetName().Version;
-            versionLabel.Location = new(50, 90);
+            versionLabel.Text     = "・バージョン                            " + assembly.GetName().Version;
+            versionLabel.Location = new(30, 80);
 
             discLabel          = new();
             discLabel.AutoSize = true;
             discLabel.Text     = "・説明                   ";
-            discLabel.Location = new(50, 120);
+            discLabel.Location = new(30, 110);
 
             discBox            = new();
-            discBox.Location   = new(150, 120);
-            discBox.Size       = new(240, 80);
+            discBox.Location   = new(120, 110);
+            discBox.Size       = new(200, 80);
             discBox.Multiline  = true;
             discBox.ReadOnly   = true;
             discBox.DetectUrls = true;
@@ -422,8 +431,8 @@ class VersionInfo : Base {
             Controls.Add (productLabel);
             Controls.Add (authorLabel);
             Controls.Add (versionLabel);
+            Controls.Add(discBox);
             Controls.Add (discLabel);
-            Controls.Add (discBox);
 
         } catch (NullReferenceException e) {
             MessageBox.Show (e.ToString(), "なんやこれ！", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
