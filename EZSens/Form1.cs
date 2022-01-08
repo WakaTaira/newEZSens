@@ -225,8 +225,7 @@ public partial class Form1 : Base {
             return;
         }
         switch (gameidx) {
-        case 0: try { throw new Exception ("test");
-            } catch (Exception ex) { hipdistLabel.Text = ex.Message; }
+        case 0:
             if (hipfov < 1 || (hipfov > 2 && hipfov < 70) || hipfov > 110) {
                 MessageBox.Show (
                   "In-Game FOVは70から110のゲーム内FOVで入力してください。\r\n1から2のfovScaleでも計算できます",
