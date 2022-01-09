@@ -9,38 +9,31 @@ public class Base : Form {
             return;
         }
     }
-    protected void urlClick(object sender, EventArgs e) {
+    protected void urlClick (object sender, EventArgs e) {
         string url = "";
         if (sender is LinkLabel link) {
             link.LinkVisited = true;
-            url = link.Text;
+            url              = link.Text;
         } else if (sender is ToolStripMenuItem item) {
             url = item.Name;
         }
-        var info         = new ProcessStartInfo {
-            UseShellExecute = true,
-            FileName        = url
-        };
+        var info = new ProcessStartInfo { UseShellExecute = true, FileName = url };
         Process.Start (info);
     }
     protected void urlClick (object sender, LinkClickedEventArgs e) {
-        var info = new ProcessStartInfo {
-            UseShellExecute = true,
-            FileName        = e.LinkText
-        };
+        var info = new ProcessStartInfo { UseShellExecute = true, FileName = e.LinkText };
         Process.Start (info);
     }
-    //protected void urlClick (object sender, ToolStripDropDownClosedEventArgs e) {
-    //    var info = new ProcessStartInfo {
-    //        UseShellExecute = true,
-    //        FileName = ((ToolStripMenuItem)sender).Name
-    //    };
-    //    Process.Start (info);
-    //}
+    // protected void urlClick (object sender, ToolStripDropDownClosedEventArgs e) {
+    //     var info = new ProcessStartInfo {
+    //         UseShellExecute = true,
+    //         FileName = ((ToolStripMenuItem)sender).Name
+    //     };
+    //     Process.Start (info);
+    // }
     protected string myTwitter = "https://twitter.com/IAMNuN999";
     protected string myDiscord = "https://discord.com/users/496880049513955340";
-    public Base() {
-    }
+    public Base() {}
 }
 public partial class Form1 : Base {
     private readonly Label     gamelistLabel, aratioLabel, mdratioLabel, hipfovLabel, hipdistLabel, msensUrlDisc;
@@ -49,14 +42,15 @@ public partial class Form1 : Base {
     private readonly TextBox   mdratioBox, hipfovBox, hipdistBox, result;
     private readonly Button    pastemdratio, pastehipfov, pastehipdist, doCalc;
     private readonly MenuStrip menuStrip;
-    private readonly ToolStripMenuItem helpMenuItem, versionInfoMenuItem, linkMyTwitterInfoMenuItem, linkMyDiscordInfoMenuItem, appMenuItem, exitMenuItem, resetMenuItem;
-    int                        gameidx, aridx;
-    bool                       suutihantei;
-    double                     aratio, mdratio, hipfov, hipdist, alpha0, alpha1;
+    private readonly ToolStripMenuItem helpMenuItem, versionInfoMenuItem, linkMyTwitterInfoMenuItem,
+      linkMyDiscordInfoMenuItem, appMenuItem, exitMenuItem, resetMenuItem;
+    int              gameidx, aridx;
+    bool             suutihantei;
+    double           aratio, mdratio, hipfov, hipdist, alpha0, alpha1;
     private readonly Dictionary<string, double> fovWithOptics, distanceWithOptics;
     public Form1() {
         InitializeComponent();
-        Size = new Size (600, 520);
+        Size            = new Size (600, 520);
         FormBorderStyle = FormBorderStyle.FixedSingle;
         MinimizeBox     = false;
         MaximizeBox     = false;
@@ -89,7 +83,7 @@ public partial class Form1 : Base {
         msensUrlDisc          = new();
         msensUrlDisc.AutoSize = true;
         msensUrlDisc.Location = new(200, 450);
-        msensUrlDisc.Text       = "このサイトにて腰だめ振り向きの取得、振り向きからセンシへの変換が可能です";
+        msensUrlDisc.Text = "このサイトにて腰だめ振り向きの取得、振り向きからセンシへの変換が可能です";
 
         msensUrl          = new();
         msensUrl.AutoSize = true;
@@ -173,13 +167,13 @@ public partial class Form1 : Base {
         menuStrip = new MenuStrip();
         SuspendLayout();
         menuStrip.SuspendLayout();
-        helpMenuItem = new("ヘルプ(&H)");
-        versionInfoMenuItem = new("バージョン情報(&V)", null, versionInfoClick!);
-        linkMyTwitterInfoMenuItem = new("Twitter(&T)");
-        linkMyDiscordInfoMenuItem = new("Discord(&D)");
-        appMenuItem = new("アプリケーション(&A)");
-        exitMenuItem = new("終了(&X)", null, exitMenuItemClick!);
-        resetMenuItem = new("リセット(&R)", null, resetMenuItemClick!);
+        helpMenuItem                   = new("ヘルプ(&H)");
+        versionInfoMenuItem            = new("バージョン情報(&V)", null, versionInfoClick!);
+        linkMyTwitterInfoMenuItem      = new("Twitter(&T)");
+        linkMyDiscordInfoMenuItem      = new("Discord(&D)");
+        appMenuItem                    = new("アプリケーション(&A)");
+        exitMenuItem                   = new("終了(&X)", null, exitMenuItemClick!);
+        resetMenuItem                  = new("リセット(&R)", null, resetMenuItemClick!);
         linkMyTwitterInfoMenuItem.Name = myTwitter;
         linkMyDiscordInfoMenuItem.Name = myDiscord;
         linkMyTwitterInfoMenuItem.Click += urlClick!;
@@ -212,9 +206,9 @@ public partial class Form1 : Base {
         Controls.Add (result);
         Controls.Add (menuStrip);
         MainMenuStrip = menuStrip;
-        menuStrip.ResumeLayout(false);
+        menuStrip.ResumeLayout (false);
         menuStrip.PerformLayout();
-        ResumeLayout(false);
+        ResumeLayout (false);
         PerformLayout();
         Text = "EZSens C#";
     }
@@ -486,12 +480,8 @@ public partial class Form1 : Base {
               "\r\n  ※注意事項※\r\n ApexではRE-45のアイアンサイト、AR、LMGとスナイパーのアイアンサイト、SMGとSGとRE-45以外のピストルのアイアンサイトはFOVがそれぞれ違いますが、感度が共有されています。\r\nSMG等と1xスコープはFOVが同じなので、設定する際は1X Scope / ADS (SMG, SG, Pistol)を基準とすることをお勧めします。\r\nまた、設定ファイルにおけるmouse_zoomed_sensitivity_scalar_7は使われていません。無視してください。");
         }
     }
-    private void exitMenuItemClick(object sender, EventArgs e) {
-        Application.Exit();
-    }
-    private void resetMenuItemClick(object sender, EventArgs e) {
-        Application.Restart();
-    }
+    private void exitMenuItemClick (object sender, EventArgs e) { Application.Exit(); }
+    private void resetMenuItemClick (object sender, EventArgs e) { Application.Restart(); }
 }
 class VersionInfo : Base {
     private readonly Label? productLabel, authorLabel, versionLabel, discLabel;
@@ -530,7 +520,7 @@ class VersionInfo : Base {
         discBox.Multiline  = true;
         discBox.ReadOnly   = true;
         discBox.DetectUrls = true;
-        discBox.Text       = disc + "\r\nバグったらTwitter\r\n" + myTwitter + "\r\nDiscord\r\n" + myDiscord + "\r\nまで";
+        discBox.Text = disc + "\r\nバグったらTwitter\r\n" + myTwitter + "\r\nDiscord\r\n" + myDiscord + "\r\nまで";
         discBox.LinkClicked += urlClick!;
 
         Controls.Add (productLabel);
