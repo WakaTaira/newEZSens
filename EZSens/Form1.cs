@@ -1,126 +1,199 @@
 using System.Diagnostics;
 using System.Reflection;
+using System.Security.Permissions;
+using System.ComponentModel;
 
 namespace EZSens {
 public class Base : Form {
-    protected void urlClick (object sender, EventArgs e) {
-        LinkLabel link   = (LinkLabel)sender;
-        link.LinkVisited = true;
+    protected void getOnlyNums (object sender, KeyPressEventArgs e) {
+        if (e.KeyChar != '\b' && (e.KeyChar < '0' || '9' < e.KeyChar) && e.KeyChar != '.') {
+            e.Handled = true;
+            return;
+        }
+    }
+    protected void urlClick(object sender, EventArgs e) {
+        string url = "";
+        if (sender is LinkLabel link) {
+            link.LinkVisited = true;
+            url = link.Text;
+        } else if (sender is ToolStripMenuItem item) {
+            url = item.Name;
+        }
         var info         = new ProcessStartInfo {
             UseShellExecute = true,
-            FileName        = link.Text,
+            FileName        = url
         };
         Process.Start (info);
     }
     protected void urlClick (object sender, LinkClickedEventArgs e) {
         var info = new ProcessStartInfo {
             UseShellExecute = true,
-            FileName        = e.LinkText,
+            FileName        = e.LinkText
         };
         Process.Start (info);
     }
+    //protected void urlClick (object sender, ToolStripDropDownClosedEventArgs e) {
+    //    var info = new ProcessStartInfo {
+    //        UseShellExecute = true,
+    //        FileName = ((ToolStripMenuItem)sender).Name
+    //    };
+    //    Process.Start (info);
+    //}
+    protected string myTwitter = "https://twitter.com/IAMNuN999";
+    protected string myDiscord = "https://discord.com/users/496880049513955340";
+    public Base() {
+    }
 }
 public partial class Form1 : Base {
-    private readonly Label     gamelistLabel, aratioLabel, mdratioLabel, hipfovLabel, hipdistLabel, go;
+    private readonly Label     gamelistLabel, aratioLabel, mdratioLabel, hipfovLabel, hipdistLabel, msensUrlDisc;
     private readonly LinkLabel msensUrl;
     private readonly ComboBox  gamelistBox, aratioBox;
     private readonly TextBox   mdratioBox, hipfovBox, hipdistBox, result;
-    private readonly Button    doCalc, ver;
+    private readonly Button    pastemdratio, pastehipfov, pastehipdist, doCalc;
+    private readonly MenuStrip menuStrip;
+    private readonly ToolStripMenuItem helpMenuItem, versionInfoMenuItem, linkMyTwitterInfoMenuItem, linkMyDiscordInfoMenuItem, appMenuItem, exitMenuItem, resetMenuItem;
     int                        gameidx, aridx;
     bool                       suutihantei;
     double                     aratio, mdratio, hipfov, hipdist, alpha0, alpha1;
     private readonly Dictionary<string, double> fovWithOptics, distanceWithOptics;
     public Form1() {
         InitializeComponent();
-        Width           = 600;
+        Size = new Size (600, 520);
         FormBorderStyle = FormBorderStyle.FixedSingle;
         MinimizeBox     = false;
         MaximizeBox     = false;
 
         gamelistLabel          = new();
         gamelistLabel.AutoSize = true;
-        gamelistLabel.Location = new(20, 20);
+        gamelistLabel.Location = new(20, 40);
         gamelistLabel.Text     = "・Game title";
 
         aratioLabel          = new();
         aratioLabel.AutoSize = true;
-        aratioLabel.Location = new(20, 90);
+        aratioLabel.Location = new(20, 120);
         aratioLabel.Text     = "・Aspact ratio";
 
         mdratioLabel          = new();
         mdratioLabel.AutoSize = true;
-        mdratioLabel.Location = new(20, 160);
+        mdratioLabel.Location = new(20, 200);
         mdratioLabel.Text     = "・Monitor Distance [%]";
 
         hipfovLabel          = new();
         hipfovLabel.AutoSize = true;
-        hipfovLabel.Location = new(20, 230);
+        hipfovLabel.Location = new(20, 280);
         hipfovLabel.Text     = "・In-Game Hipfire FOV";
 
         hipdistLabel          = new();
         hipdistLabel.AutoSize = true;
-        hipdistLabel.Location = new(20, 300);
+        hipdistLabel.Location = new(20, 360);
         hipdistLabel.Text     = "・Hipfire 360° Distance [cm]";
 
-        go          = new();
-        go.AutoSize = true;
-        go.Location = new(200, 380);
+        msensUrlDisc          = new();
+        msensUrlDisc.AutoSize = true;
+        msensUrlDisc.Location = new(200, 450);
+        msensUrlDisc.Text       = "このサイトにて腰だめ振り向きの取得、振り向きからセンシへの変換が可能です";
 
         msensUrl          = new();
         msensUrl.AutoSize = true;
-        msensUrl.Location = new(220, 380);
-        msensUrl.Click += new(urlClick!);
+        msensUrl.Location = new(200, 430);
+        msensUrl.Click += urlClick!;
+        msensUrl.Text = "https://www.mouse-sensitivity.com/";
 
         result            = new();
-        result.Size       = new(360, 350);
+        result.Size       = new(360, 380);
         result.Multiline  = true;
         result.ReadOnly   = true;
-        result.Location   = new(180, 20);
+        result.Location   = new(200, 40);
         result.ScrollBars = ScrollBars.Vertical;
         result.Text       = "計算結果";
 
         string[] gamelist    = new string[] { "Apex", "R6S", "Valorant", "Splitgate", "CSGO", "Overwatch" };
         gamelistBox          = new();
-        gamelistBox.Location = new(20, 40);
+        gamelistBox.Location = new(20, 70);
         gamelistBox.Items.AddRange (gamelist);
         gamelistBox.DropDownStyle = ComboBoxStyle.DropDownList; // 入力不可のリストにする
-        gamelistBox.SelectedIndexChanged += new(gameSelected!);
+        gamelistBox.SelectedIndexChanged += gameSelected!;
 
         string[] aratiolist = new string[] { "16:9", "5:3", "16:10", "3:2", "4:3", "5:4", "1:1" };
         aratioBox           = new();
-        aratioBox.Location  = new(20, 110);
+        aratioBox.Location  = new(20, 150);
         aratioBox.Items.AddRange (aratiolist);
         aratioBox.DropDownStyle = ComboBoxStyle.DropDownList;
 
-        // TODO: 0～9、ピリオド以外はイベントキャンセルにする
-        mdratioBox          = new();
-        mdratioBox.Location = new(20, 180);
-        mdratioBox.ImeMode  = ImeMode.Disable;
+        mdratioBox                  = new();
+        mdratioBox.Location         = new(20, 230);
+        mdratioBox.Size             = new(120, 25);
+        mdratioBox.ImeMode          = ImeMode.Disable;
+        mdratioBox.ShortcutsEnabled = false;
+        mdratioBox.KeyPress += getOnlyNums!;
 
-        hipfovBox          = new();
-        hipfovBox.Location = new(20, 250);
-        hipfovBox.ImeMode  = ImeMode.Disable;
+        hipfovBox                  = new();
+        hipfovBox.Location         = new(20, 310);
+        hipfovBox.Size             = new(120, 25);
+        hipfovBox.ImeMode          = ImeMode.Disable;
+        hipfovBox.ShortcutsEnabled = false;
+        hipfovBox.KeyPress += getOnlyNums!;
 
-        hipdistBox          = new();
-        hipdistBox.Location = new(20, 320);
-        hipdistBox.ImeMode  = ImeMode.Disable;
+        hipdistBox                  = new();
+        hipdistBox.Location         = new(20, 390);
+        hipdistBox.Size             = new(120, 25);
+        hipdistBox.ImeMode          = ImeMode.Disable;
+        hipdistBox.ShortcutsEnabled = false;
+        hipdistBox.KeyPress += getOnlyNums!;
+
+        pastemdratio          = new();
+        pastemdratio.Location = new(140, 230);
+        pastemdratio.Text     = "Paste";
+        pastemdratio.Name     = "m";
+        pastemdratio.Size     = new(50, 25);
+        pastemdratio.Click += pasteFromClipBoard!;
+
+        pastehipfov          = new();
+        pastehipfov.Location = new(140, 310);
+        pastehipfov.Text     = "Paste";
+        pastehipfov.Name     = "f";
+        pastehipfov.Size     = new(50, 25);
+        pastehipfov.Click += pasteFromClipBoard!;
+
+        pastehipdist          = new();
+        pastehipdist.Location = new(140, 390);
+        pastehipdist.Text     = "Paste";
+        pastehipdist.Name     = "d";
+        pastehipdist.Size     = new(50, 25);
+        pastehipdist.Click += pasteFromClipBoard!;
 
         doCalc             = new();
-        doCalc.Location    = new(460, 405);
+        doCalc.Location    = new(60, 430);
         doCalc.Name        = "計算実行";
         doCalc.Size        = new(75, 23);
         doCalc.TabIndex    = 0;
         doCalc.Text        = "計算実行";
         fovWithOptics      = new Dictionary<string, double>();
         distanceWithOptics = new Dictionary<string, double>();
-        doCalc.Click += new(doCalcClick!);
+        doCalc.Click += doCalcClick!;
 
-        ver          = new();
-        ver.Location = new(20, 405);
-        ver.Name     = "version";
-        ver.AutoSize = true;
-        ver.Text     = "バージョン情報";
-        ver.Click += new(versionInfoClick!);
+        menuStrip = new MenuStrip();
+        SuspendLayout();
+        menuStrip.SuspendLayout();
+        helpMenuItem = new("ヘルプ(&H)");
+        versionInfoMenuItem = new("バージョン情報(&V)", null, versionInfoClick!);
+        linkMyTwitterInfoMenuItem = new("Twitter(&T)");
+        linkMyDiscordInfoMenuItem = new("Discord(&D)");
+        appMenuItem = new("アプリケーション(&A)");
+        exitMenuItem = new("終了(&X)", null, exitMenuItemClick!);
+        resetMenuItem = new("リセット(&R)", null, resetMenuItemClick!);
+        linkMyTwitterInfoMenuItem.Name = myTwitter;
+        linkMyDiscordInfoMenuItem.Name = myDiscord;
+        linkMyTwitterInfoMenuItem.Click += urlClick!;
+        linkMyDiscordInfoMenuItem.Click += urlClick!;
+        helpMenuItem.DropDownItems.Add (versionInfoMenuItem);
+        helpMenuItem.DropDownItems.Add (linkMyTwitterInfoMenuItem);
+        helpMenuItem.DropDownItems.Add (linkMyDiscordInfoMenuItem);
+        menuStrip.Items.Add (helpMenuItem);
+        appMenuItem.DropDownItems.Add (exitMenuItem);
+        appMenuItem.DropDownItems.Add (resetMenuItem);
+        menuStrip.Items.Add (appMenuItem);
+
 
         Controls.Add (gamelistBox);
         Controls.Add (gamelistLabel);
@@ -128,16 +201,37 @@ public partial class Form1 : Base {
         Controls.Add (aratioLabel);
         Controls.Add (mdratioBox);
         Controls.Add (mdratioLabel);
-        Controls.Add (go);
         Controls.Add (msensUrl);
+        Controls.Add (msensUrlDisc);
         Controls.Add (hipfovBox);
         Controls.Add (hipfovLabel);
         Controls.Add (hipdistBox);
         Controls.Add (hipdistLabel);
-        Controls.Add (ver);
+        Controls.Add (pastemdratio);
+        Controls.Add (pastehipfov);
+        Controls.Add (pastehipdist);
         Controls.Add (doCalc);
         Controls.Add (result);
+        Controls.Add (menuStrip);
+        MainMenuStrip = menuStrip;
+        menuStrip.ResumeLayout(false);
+        menuStrip.PerformLayout();
+        ResumeLayout(false);
+        PerformLayout();
         Text = "EZSens C#";
+    }
+    private void pasteFromClipBoard (object sender, EventArgs e) {
+        IDataObject clipData = Clipboard.GetDataObject();
+        string      clipStr;
+        if (clipData.GetDataPresent (DataFormats.Text) &&
+            double.TryParse ((string)clipData.GetData (DataFormats.Text), out double _)) {
+            clipStr = (string)clipData.GetData (DataFormats.Text);
+            switch (((Button)sender).Name) {
+            case "m": mdratioBox.Text = clipStr; break;
+            case "f": hipfovBox.Text = clipStr; break;
+            case "d": hipdistBox.Text = clipStr; break;
+            }
+        }
     }
     private static double division (string frac) {
         string[] arr = frac.Split ('/');
@@ -150,7 +244,22 @@ public partial class Form1 : Base {
         return ret;
     }
     protected void versionInfoClick (object sender, EventArgs e) {
-        VersionInfo versionInfo = new();
+        Assembly               assembly = Assembly.GetExecutingAssembly();
+        AssemblyTitleAttribute assemblyTitleAttribute =
+          assembly.GetCustomAttribute<AssemblyTitleAttribute>() ?? new("hoge");
+        AssemblyDescriptionAttribute assemblyDescriptionAttribute =
+          assembly.GetCustomAttribute<AssemblyDescriptionAttribute>() ?? new("hoge");
+        Version version        = assembly.GetName().Version ?? new();
+        string  title          = assemblyTitleAttribute.Title;
+        string  trimmedVersion = version.ToString (2);
+        string  disc           = assemblyDescriptionAttribute.Description;
+
+        if (title == "hoge" || disc == "hoge" || version.ToString() == "0.0") {
+            MessageBox.Show ("これが出たらTwitter:@IAMNuN999まで報告して", "(´;ω;｀)", MessageBoxButtons.OK,
+                             MessageBoxIcon.Warning);
+            return;
+        }
+        VersionInfo versionInfo = new(title, version, trimmedVersion, disc);
         versionInfo.ShowDialog();
     }
     private void gameSelected (object sender, EventArgs e) {
@@ -378,72 +487,59 @@ public partial class Form1 : Base {
             result.AppendText (
               "\r\n  ※注意事項※\r\n ApexではRE-45のアイアンサイト、AR、LMGとスナイパーのアイアンサイト、SMGとSGとRE-45以外のピストルのアイアンサイトはFOVがそれぞれ違いますが、感度が共有されています。\r\nSMG等と1xスコープはFOVが同じなので、設定する際は1X Scope / ADS (SMG, SG, Pistol)を基準とすることをお勧めします。\r\nまた、設定ファイルにおけるmouse_zoomed_sensitivity_scalar_7は使われていません。無視してください。");
         }
-        go.Text       = "go";
-        msensUrl.Text = "https://www.mouse-sensitivity.com/";
+    }
+    private void exitMenuItemClick(object sender, EventArgs e) {
+        Application.Exit();
+    }
+    private void resetMenuItemClick(object sender, EventArgs e) {
+        Application.Restart();
     }
 }
 class VersionInfo : Base {
     private readonly Label? productLabel, authorLabel, versionLabel, discLabel;
     private readonly RichTextBox? discBox;
-    public VersionInfo() {
+    public VersionInfo (string title, Version version, string trimmedVersion, string disc) {
         Text            = "バージョン情報";
         MaximizeBox     = false;
         MinimizeBox     = false;
         ShowInTaskbar   = false;
         FormBorderStyle = FormBorderStyle.FixedSingle;
-        Size            = new(380, 250);
-        try {
-            Assembly assembly = Assembly.GetExecutingAssembly();
-            string   title    = assembly.GetCustomAttribute<AssemblyTitleAttribute>().Title;
-            string   version  = assembly.GetName().Version.ToString (2);
-            string   disc     = assembly.GetCustomAttribute<AssemblyDescriptionAttribute>().Description;
+        Size            = new(450, 280);
 
-            productLabel          = new();
-            productLabel.AutoSize = true;
-            productLabel.Text     = "・アプリ名                              " + title + " v" + version;
-            productLabel.Location = new(30, 20);
+        productLabel          = new();
+        productLabel.AutoSize = true;
+        productLabel.Text     = "・アプリ名                              " + title + " v" + trimmedVersion;
+        productLabel.Location = new(30, 20);
 
-            authorLabel          = new();
-            authorLabel.AutoSize = true;
-            authorLabel.Text     = "・製作者                               WakaTaira";
-            authorLabel.Location = new(30, 50);
+        authorLabel          = new();
+        authorLabel.AutoSize = true;
+        authorLabel.Text     = "・製作者                               WakaTaira";
+        authorLabel.Location = new(30, 50);
 
-            versionLabel          = new();
-            versionLabel.AutoSize = true;
-            versionLabel.Text     = "・バージョン                            " + assembly.GetName().Version;
-            versionLabel.Location = new(30, 80);
+        versionLabel          = new();
+        versionLabel.AutoSize = true;
+        versionLabel.Text     = "・バージョン                            " + version;
+        versionLabel.Location = new(30, 80);
 
-            discLabel          = new();
-            discLabel.AutoSize = true;
-            discLabel.Text     = "・説明                   ";
-            discLabel.Location = new(30, 110);
+        discLabel          = new();
+        discLabel.AutoSize = true;
+        discLabel.Text     = "・説明                   ";
+        discLabel.Location = new(30, 110);
 
-            discBox            = new();
-            discBox.Location   = new(120, 110);
-            discBox.Size       = new(200, 80);
-            discBox.Multiline  = true;
-            discBox.ReadOnly   = true;
-            discBox.DetectUrls = true;
-            discBox.Text       = disc + "\r\nバグったらTwitter\r\nhttps://twitter.com/IAMNuN999まで";
-            discBox.LinkClicked += new(urlClick!);
+        discBox            = new();
+        discBox.Location   = new(120, 110);
+        discBox.Size       = new(270, 120);
+        discBox.Multiline  = true;
+        discBox.ReadOnly   = true;
+        discBox.DetectUrls = true;
+        discBox.Text       = disc + "\r\nバグったらTwitter\r\n" + myTwitter + "\r\nDiscord\r\n" + myDiscord + "\r\nまで";
+        discBox.LinkClicked += urlClick!;
 
-            Controls.Add (productLabel);
-            Controls.Add (authorLabel);
-            Controls.Add (versionLabel);
-            Controls.Add(discBox);
-            Controls.Add (discLabel);
-
-        } catch (NullReferenceException e) {
-            MessageBox.Show (e.ToString(), "なんやこれ！", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-            MessageBox.Show ("予期していない例外です。Twitter:@IAMNuN999まで教えてください", "エラー",
-                             MessageBoxButtons.OK, MessageBoxIcon.Error);
-            Application.Exit();
-        } catch (Exception e) {
-            MessageBox.Show (e.ToString(), "なんやこれ！", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-            MessageBox.Show ("予期していない例外です。Twitter:@IAMNuN999まで教えてください", "エラー",
-                             MessageBoxButtons.OK, MessageBoxIcon.Error);
-            Application.Exit();
-        }
+        Controls.Add (productLabel);
+        Controls.Add (authorLabel);
+        Controls.Add (versionLabel);
+        Controls.Add (discBox);
+        Controls.Add (discLabel);
     }
 }
 }
