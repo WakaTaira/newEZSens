@@ -1,7 +1,5 @@
 using System.Diagnostics;
 using System.Reflection;
-using System.Security.Permissions;
-using System.ComponentModel;
 
 namespace EZSens {
 public class Base : Form {
