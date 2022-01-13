@@ -43,7 +43,7 @@ public partial class Form1 : Base {
     private readonly Button    pastemdratio, pastehipfov, pastehipdist, doCalc;
     private readonly MenuStrip menuStrip;
     private readonly ToolStripMenuItem helpMenuItem, versionInfoMenuItem, linkMyTwitterInfoMenuItem,
-      linkMyDiscordInfoMenuItem, appMenuItem, exitMenuItem, resetMenuItem;
+      linkMyDiscordInfoMenuItem, exitMenuItem;
     int              gameidx, aridx;
     bool             suutihantei;
     double           aratio, mdratio, hipfov, hipdist, alpha0, alpha1;
@@ -171,9 +171,7 @@ public partial class Form1 : Base {
         versionInfoMenuItem            = new("バージョン情報(&V)", null, versionInfoClick!);
         linkMyTwitterInfoMenuItem      = new("Twitter(&T)");
         linkMyDiscordInfoMenuItem      = new("Discord(&D)");
-        appMenuItem                    = new("アプリケーション(&A)");
         exitMenuItem                   = new("終了(&X)", null, exitMenuItemClick!);
-        resetMenuItem                  = new("リセット(&R)", null, resetMenuItemClick!);
         linkMyTwitterInfoMenuItem.Name = myTwitter;
         linkMyDiscordInfoMenuItem.Name = myDiscord;
         linkMyTwitterInfoMenuItem.Click += urlClick!;
@@ -182,9 +180,7 @@ public partial class Form1 : Base {
         helpMenuItem.DropDownItems.Add (linkMyTwitterInfoMenuItem);
         helpMenuItem.DropDownItems.Add (linkMyDiscordInfoMenuItem);
         menuStrip.Items.Add (helpMenuItem);
-        appMenuItem.DropDownItems.Add (exitMenuItem);
-        appMenuItem.DropDownItems.Add (resetMenuItem);
-        menuStrip.Items.Add (appMenuItem);
+        menuStrip.Items.Add (exitMenuItem);
 
 
         Controls.Add (gamelistBox);
@@ -481,7 +477,6 @@ public partial class Form1 : Base {
         }
     }
     private void exitMenuItemClick (object sender, EventArgs e) { Application.Exit(); }
-    private void resetMenuItemClick (object sender, EventArgs e) { Application.Restart(); }
 }
 class VersionInfo : Base {
     private readonly Label? productLabel, authorLabel, versionLabel, discLabel;
