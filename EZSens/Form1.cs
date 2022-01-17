@@ -442,7 +442,7 @@ public partial class Form1 : Base {
             distanceWithOptics.Add ("Zoomed 2: SSG 08, G3SG1, SCAR-20", 0.0);
             distanceWithOptics.Add ("Zoomed: AUG, SG 553", 0.0);
 
-            verticalFOVtoHrizontalFOV();
+            fix4to3Hdeg();
             calc();
             break;
         case 5:
