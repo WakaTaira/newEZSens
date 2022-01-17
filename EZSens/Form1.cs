@@ -259,6 +259,11 @@ public partial class Form1 : Base {
             hipfovBox.Text          = "103";
             hipfovBox.ReadOnly      = true;
             break;
+        case 4:
+            aratioBox.Enabled       = true;
+            hipfovBox.Text = "90";
+            hipfovBox.Enabled = false;
+            break;
         case 5:
             aratioBox.SelectedIndex = 0;
             hipfovBox.Text          = "";
