@@ -1,3 +1,4 @@
 # newEZSens
 
 ソースコード見んな
+直してないけどapexのmouse_zoomed_sensitivity_scalar_7はランパートウルト説あり
